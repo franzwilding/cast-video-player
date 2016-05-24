@@ -1,0 +1,11 @@
+{
+  "name": "cast-video-player",
+  "homepage": "https://github.com/franzwilding/cast-video-player",
+  "authors": [
+    "Franz Wilding <franz@2robots.at>"
+  ],
+  "description": "A web component that can be included to play any (HTML 5) video on a website in any Chrome browser.",
+  "dependencies": {
+    "polymer": "~1.4.0"
+  }
+}

@@ -1,0 +1,501 @@
+<script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+<link rel="import"  href="https://cdn.rawgit.com/Polymer/polymer/master/polymer.html">
+
+<dom-module id="cast-control">
+
+    <template>
+        <style>
+            .control-block {
+                position: relative;
+                margin-top: -10px;
+            }
+
+            .control-block.busy:after {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                content: "";
+                display: block;
+                opacity: 0.5;
+                background: black;
+            }
+
+            .control-block .input-range {
+                display: -webkit-box;
+                display: flex;
+                -webkit-box-align: center;
+                align-items: center;
+                padding: 0 20px;
+                font-size: 9px;
+            }
+
+            .control-block .input-range input {
+                flex: 1;
+                -webkit-flex: 1;
+            }
+
+            .button-group {
+                text-align: center;
+                padding: 0 20px;
+                font-size: 9px;
+            }
+
+            .control-block .round-icon {
+                width: 26px;
+                height: 26px;
+                background: none;
+                color: white;
+                border-color: white;
+                display: inline-block;
+                position: relative;
+                margin: 0 5px;
+                vertical-align: middle;
+            }
+
+            .control-block .round-icon.big {
+                height: 44px;
+                width: 44px;
+                border-radius: 50px;
+            }
+
+            .control-block .round-icon svg {
+                color: white;
+                width: 8px;
+                height: 8px;
+                margin: -4px 0 0 -4px;
+            }
+
+            .control-block .round-icon.big svg {
+                width: 20px;
+                height: 20px;
+                margin: -10px 0 0 -10px;
+            }
+
+            :host {
+                height: 200px;
+                position: fixed;
+                top: auto;
+                left: 0;
+                right: 0;
+                bottom: -150px;
+                background: rgba(0,0,0,0.8);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                color: white;
+                z-index: 10;
+                transition: bottom 0.1s ease-in;
+            }
+
+            :host.open {
+                bottom: 0;
+            }
+
+            :host header {
+                height: 50px;
+                position: relative;
+            }
+
+            :host header .icon {
+                position: absolute;
+                top: 20px;
+                left: 15px;
+            }
+
+            :host header .icon svg {
+                width: 20px;
+                height: 10px;
+                position: absolute;
+                top: 0;
+                left: 0;
+                transition: transform 0.4s ease-in-out;
+            }
+
+            :host.open header .icon svg {
+                transform: rotate(180deg);
+            }
+
+            :host header h2,
+            :host header p {
+                line-height: 25px;
+                font-size: 10px;
+                margin: 0;
+                position: absolute;
+                left: 50px;
+                right: 50px;
+                height: 50px;
+                text-align: left;
+            }
+
+            :host header h2 {
+                font-size: 14px;
+                font-weight: normal;
+                line-height: 33px;
+                height: auto;
+            }
+
+            :host header p {
+                top: 27px;
+                height: auto;
+                line-height: 10px;
+            }
+
+            :host header.one-line p {
+                line-height: 50px;
+                top: 0;
+            }
+
+
+
+            input[type="range"] {
+                display: inline-block;
+                overflow: hidden;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                padding-right: 2px;
+                padding-left: 1px;
+                width: auto;
+                height: 43px;
+                outline: none;
+                background: -webkit-linear-gradient(left, #ccc 0%, #ccc 100%);
+                background: linear-gradient(to right, #ccc 0%, #ccc 100%);
+                background-position: center;
+                background-size: 99% 2px;
+                background-repeat: no-repeat;
+                -webkit-appearance: none; }
+
+            input[type="range"]::-webkit-slider-thumb {
+                position: relative;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background-color: #fff;
+                box-shadow: 0 0 2px rgba(0, 0, 0, 0.3), 0 3px 5px rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+                -webkit-appearance: none;
+                border: 0; }
+
+            input[type="range"]::-webkit-slider-thumb:before {
+                /* what creates the colorful line on the left side of the slider */
+                position: absolute;
+                top: 13px;
+                left: -2001px;
+                width: 2000px;
+                height: 4px;
+                background: white;
+                content: ' ';
+            }
+
+
+            input[type="range"]::-webkit-slider-thumb:after {
+                /* create a larger (but hidden) hit area */
+                position: absolute;
+                top: -15px;
+                left: -15px;
+                padding: 30px;
+                content: ' ';
+            }
+
+            :host .range-input-icon-labe svg {
+                width: 10px;
+                height: 10px;
+            }
+
+        </style>
+
+        <template is="dom-if" if="{{ loading }}">
+            <header class="one-line">
+                <div class="icon">
+                    <svg>
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-arrow-down"></use>
+                    </svg>
+                </div>
+                <p>Chromecast suchen / laden...</p>
+            </header>
+        </template>
+        <template is="dom-if" if="{{ !loading }}">
+
+            <template is="dom-if" if="{{ !videoReady }}">
+                <header class="one-line">
+                    <div class="icon">
+                        <svg>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-arrow-down"></use>
+                        </svg>
+                    </div>
+                    <p>Chromecast ist bereit</p>
+                </header>
+            </template>
+            <template is="dom-if" if="{{ videoReady }}">
+                <header on-tap="toggleOpen">
+                    <div class="icon">
+                        <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-arrow-down"></use></svg>
+                    </div>
+                    <h2>{{ title }}</h2>
+                    <p>{{ subtitle }}</p>
+                </header>
+                <div class$="{{ controlClass(busy) }}">
+                    <article class="input-range">
+                        <label for="cast-control-position-input">{{ secText(position, 0) }}</label>
+                        <input id="cast-control-position-input" type="range" min="0" max="{{ duration }}" value="[[position]]" on-change="mediaSeekPosition"/>
+                        <label for="cast-control-position-input">{{ secText(duration, position) }}</label>
+                    </article>
+                    <article class="button-group">
+                        <button class="round-icon">
+                            <svg style="width: 12px; height: 12px; margin: -6px 0 0 -7px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-check"></use></svg>
+                        </button>
+                        <template is="dom-if" if="{{ !playing }}">
+                            <button class="big round-icon" on-tap="mediaPlay">
+                                <svg style="margin-left: -8px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-play"></use></svg>
+                            </button>
+                        </template>
+                        <template is="dom-if" if="{{ playing }}">
+                            <button class="big round-icon" on-tap="mediaPause">
+                                <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-pause"></use></svg>
+                            </button>
+                        </template>
+                        <button class="round-icon" on-tap="mediaStop">
+                            <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-stop"></use></svg>
+                        </button>
+                    </article>
+                    <article class="input-range" style="margin: 0 50px;">
+                        <label for="cast-control-volume-input" class="range-input-icon-labe">
+                            <template is="dom-if" if="{{ muted }}">
+                                <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-volume-zero"></use></svg>
+                            </template>
+                            <template is="dom-if" if="{{ !muted }}">
+                                <template is="dom-if" if="{{ isBetween(volume, 0, 0) }}">
+                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-volume-zero"></use></svg>
+                                </template>
+                                <template is="dom-if" if="{{ isBetween(volume, 1, 50) }}">
+                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-volume-low"></use></svg>
+                                </template>
+                                <template is="dom-if" if="{{ isBetween(volume, 51, 100) }}">
+                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-volume-high"></use></svg>
+                                </template>
+                            </template>
+                        </label>
+                        <input id="cast-control-volume-input" type="range" min="0" max="100" on-change="mediaSetVolume" value="[[volume]]"/>
+                        <button class="round-icon" on-tap="mediaToggleMute">
+                            <svg style="width: 12px; height: 12px; margin: -6px 0 0 -5px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-mute"></use></svg>
+                        </button>
+                    </article>
+                </div>
+            </template>
+        </template>
+    </template>
+
+    <script>
+        // element registration
+        Polymer({
+            is: "cast-control",
+
+            properties: {
+                title: String,
+                subtitle: String,
+                position: Number,
+                duration: { type: Number, value: 0 },
+                volume: Number,
+                muted: { type: Boolean, value: false },
+                media: Object,
+                playing: { type: Boolean, value: false },
+                castReady: { type: Boolean, value: false },
+                loading: { type: Boolean, value: true },
+                videoReady: { type: Boolean, value: false },
+                busy: { type: Boolean, value: false }
+            },
+
+            controlClass(busy) {
+              return busy ? 'busy control-block' : 'control-block';
+            },
+            secText(sec, minus) {
+                var value = sec - parseInt(minus);
+                var sec = parseInt("" + value) % 60;
+                var min = parseInt("" + (value / 60)) % 60;
+                var hours = parseInt("" + (value / 3600));
+                var ret = '';
+                if (hours > 0) { ret += hours + ':'; }
+                if(min < 10){ ret += '0'; } ret += min; ret += ':'; if(sec < 10){ ret += '0'; } ret += sec;
+                return ret;
+            },
+
+            isBetween(value, low, hight) {
+                return (value >= low && value <= hight);
+            },
+
+            toggleOpen() {
+                this.toggleClass("open");
+                return false;
+            },
+
+            close() {
+                this.classList.remove("open");
+            },
+
+            open() {
+                this.classList.add("open");
+            },
+
+            mediaPlay: function(){
+                var t = this;
+                this.media.play(new chrome.cast.media.PlayRequest());
+            },
+            mediaPause: function(){
+                var t = this;
+                this.media.pause(new chrome.cast.media.PauseRequest());
+            },
+            mediaSeekPosition: function(e){
+                var t = this;
+                this.position = e.target.value;
+                var req = new chrome.cast.media.SeekRequest();
+                req.currentTime = this.position;
+                this.media.seek(req);
+            },
+            mediaStop: function(){
+                if(this.session) {
+                    var t = this;
+                    this.session.stop(function(){
+                        t.castReady = true;
+                        t.videoReady = false;
+                        t.session = null;
+                        t.busy = false;
+                    });
+                }
+            },
+            mediaSetVolume: function(e){
+                var t = this;
+                this.volume = e.target.value;
+                var req = new chrome.cast.media.VolumeRequest();
+                req.volume = new chrome.cast.Volume(this.volume / 100, this.muted);
+                this.media.setVolume(req);
+            },
+            mediaToggleMute: function() {
+                var t = this;
+                this.muted = !this.muted;
+                var req = new chrome.cast.media.VolumeRequest();
+                req.volume = new chrome.cast.Volume(this.volume / 100, this.muted);
+                this.media.setVolume(req);
+            },
+
+            /**
+             * On component and chromecast ready, we do the following steps
+             * 1. Init Chromecast
+             * 2. Check if we have can join an existing session. If so, join in!
+             */
+            ready: function () {
+                var t = this;
+                var load = function(loaded, error){
+                    if (!loaded) { return this.onCastError(errorInfo); }
+                    chrome.cast.initialize(
+                            new chrome.cast.ApiConfig(
+                                    new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID),
+                                    function(a) { t.onCastGetSession(a, this) },
+                                    function(a) { t.onCastGetReceiver(a, this) },
+                                    chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+                            ),
+                            undefined, function(a) { t.onCastInitError(a, this) }
+                    );
+                };
+                if(window.chromeCastAlreadyLoaded) { load(true, null);
+                } else { window['__onGCastApiAvailable'] = load; }
+            },
+
+            onCastGetSession: function(session){
+                var t = this;
+                this.session = session;
+                t.session.addUpdateListener(function(){ t.onSessionUpdate(); });
+                if (session.media.length != 0) {
+                    this.onMediaDiscovered(session.media[0]);
+                }
+            },
+            onCastGetReceiver: function(status){
+                if(status === chrome.cast.ReceiverAvailability.AVAILABLE) {
+                    this.castReady = true;
+                    this.loading = false;
+                    this.fire('ready');
+                }
+            },
+            onCastError: function(error){
+                this.loading = false;
+                this.videoReady = false;
+                this.fire('error', { error: error });
+                return false;
+            },
+
+            onMediaDiscovered(media) {
+                var t = this;
+                this.media = media;
+                this.videoReady = true;
+                this.loading = false;
+                t.busy = true;
+                this.updateFromMedia();
+
+                // update on chromecast change events
+                media.addUpdateListener(function(){ t.updateFromMedia(); });
+
+                // update every sec.
+                var r = function(){
+                    setTimeout(function(){ t.position = t.media.getEstimatedTime(); r(); }, 1000);
+                }; r();
+
+                t.fire('playing');
+            },
+
+            updateFromMedia() {
+                this.duration = this.media.media.duration;
+                this.position = this.media.currentTime;
+                this.volume = this.media.volume.level * 100;
+                this.muted = this.media.volume.muted;
+                this.title = this.media.media.metadata.title;
+                this.subtitle = this.media.media.metadata.subtitle;
+                this.playing = (this.media.playerState == chrome.cast.media.PlayerState.PLAYING);
+                this.busy = (this.media.playerState == chrome.cast.media.PlayerState.BUFFERING);
+            },
+
+            onSessionUpdate() {
+
+                var t = this;
+                if(this.session.status == "stopped") {
+                    t.fire('stopped');
+                } else {
+                    setTimeout(function(){
+                        if(t.session.media.length == 0) {
+                            t.fire('ended');
+                            t.videoReady = false;
+                        }
+                    }, 1000);
+                }
+            },
+
+            castVideo(url, title, subtitle) {
+                var t = this;
+                if(!this.castReady) return false;
+                t.loading = true; t.videoReady = false;
+
+                var mediaInfo = new chrome.cast.media.MediaInfo(url, 'video/mp4');
+                mediaInfo.metadata = new chrome.cast.media.MovieMediaMetadata();
+                mediaInfo.metadata.title = title;
+                mediaInfo.metadata.subtitle = subtitle;
+                mediaInfo.metadata.type = chrome.cast.media.MetadataType.TV_SHOW;
+                var request = new chrome.cast.media.LoadRequest(mediaInfo);
+
+                // send video to chromecast
+                if(this.session) {
+                    this.session.loadMedia(request, function(media){ t.onMediaDiscovered(media); }, function(error){ t.onCastError(error); });
+                } else {
+                    chrome.cast.requestSession(function(session){
+                        session.loadMedia(request, function(media){ t.onMediaDiscovered(media); }, function(error){ t.onCastError(error); });
+                        t.session = session;
+                        t.session.addUpdateListener(function(){ t.onSessionUpdate(); });
+                    }, function(error){ t.onCastError(error); });
+                }
+            },
+
+            createVideoPlayButtons() {
+              console.log("createVideoPlayButtons");
+              console.log(this);
+            }
+        });
+    </script>
+
+</dom-module>
