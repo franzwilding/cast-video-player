@@ -229,7 +229,7 @@
             <template is="dom-if" if="{{ videoReady }}">
                 <header on-tap="toggleOpen">
                     <div class="icon">
-                        <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-arrow-down"></use></svg>
+                        <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-arrow-down"></use></svg>
                     </div>
                     <h2>{{ title }}</h2>
                     <p>{{ subtitle }}</p>
@@ -242,42 +242,42 @@
                     </article>
                     <article class="button-group">
                         <button class="round-icon">
-                            <svg style="width: 12px; height: 12px; margin: -6px 0 0 -7px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-check"></use></svg>
+                            <svg style="width: 12px; height: 12px; margin: -6px 0 0 -7px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-check"></use></svg>
                         </button>
                         <template is="dom-if" if="{{ !playing }}">
                             <button class="big round-icon" on-tap="mediaPlay">
-                                <svg style="margin-left: -8px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-play"></use></svg>
+                                <svg style="margin-left: -8px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-play"></use></svg>
                             </button>
                         </template>
                         <template is="dom-if" if="{{ playing }}">
                             <button class="big round-icon" on-tap="mediaPause">
-                                <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-pause"></use></svg>
+                                <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-pause"></use></svg>
                             </button>
                         </template>
                         <button class="round-icon" on-tap="mediaStop">
-                            <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-stop"></use></svg>
+                            <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-stop"></use></svg>
                         </button>
                     </article>
                     <article class="input-range" style="margin: 0 50px;">
                         <label for="cast-control-volume-input" class="range-input-icon-labe">
                             <template is="dom-if" if="{{ muted }}">
-                                <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-volume-zero"></use></svg>
+                                <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-volume-zero"></use></svg>
                             </template>
                             <template is="dom-if" if="{{ !muted }}">
                                 <template is="dom-if" if="{{ isBetween(volume, 0, 0) }}">
-                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-volume-zero"></use></svg>
+                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-volume-zero"></use></svg>
                                 </template>
                                 <template is="dom-if" if="{{ isBetween(volume, 1, 50) }}">
-                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-volume-low"></use></svg>
+                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-volume-low"></use></svg>
                                 </template>
                                 <template is="dom-if" if="{{ isBetween(volume, 51, 100) }}">
-                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-volume-high"></use></svg>
+                                    <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-volume-high"></use></svg>
                                 </template>
                             </template>
                         </label>
                         <input id="cast-control-volume-input" type="range" min="0" max="100" on-change="mediaSetVolume" value="[[volume]]"/>
                         <button class="round-icon" on-tap="mediaToggleMute">
-                            <svg style="width: 12px; height: 12px; margin: -6px 0 0 -5px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/bundles/cast/images/icons.svg#icon-mute"></use></svg>
+                            <svg style="width: 12px; height: 12px; margin: -6px 0 0 -5px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://rawgit.com/franzwilding/cast-video-player/master/icons.svg#icon-mute"></use></svg>
                         </button>
                     </article>
                 </div>
@@ -384,6 +384,7 @@
              */
             ready: function () {
                 var t = this;
+                this.fire('load');
                 var load = function(loaded, error){
                     if (!loaded) { return this.onCastError(errorInfo); }
                     chrome.cast.initialize(
