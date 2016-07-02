@@ -445,7 +445,7 @@
               if(this.checked) {
                 this.fire("check");
               } else {
-                this.fire("uncheck");  
+                this.fire("uncheck");
               }
             },
 
@@ -575,11 +575,6 @@
                         t.session.addUpdateListener(function(){ t.onSessionUpdate(); });
                     }, function(error){ t.onCastError(error); });
                 }
-            },
-
-            createVideoPlayButtons() {
-              console.log("createVideoPlayButtons");
-              console.log(this);
             }
         });
     </script>
