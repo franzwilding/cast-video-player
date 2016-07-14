@@ -12,7 +12,7 @@
 
             .control-block.busy:after {
                 position: absolute;
-                top: 0;
+                top: -40px;
                 right: 0;
                 bottom: 0;
                 left: 0;
@@ -457,9 +457,9 @@
             mediaToggleChecked: function(){
                 this.checked = !this.checked;
                 if(this.checked) {
-                    this.fire("check");
+                    this.fire('check');
                 } else {
-                    this.fire("uncheck");
+                    this.fire('uncheck');
                 }
             },
 
@@ -559,7 +559,7 @@
                 }
             },
 
-            castVideo(url, title, subtitle, artwork) {
+            castVideo(url, title, subtitle, customData) {
                 var t = this;
                 if(!this.castReady) return false;
                 t.loading = true; t.videoReady = false;
@@ -570,11 +570,8 @@
                 mediaInfo.metadata.title = title;
                 mediaInfo.metadata.subtitle = subtitle;
                 mediaInfo.metadata.type = chrome.cast.media.MetadataType.TV_SHOW;
+                mediaInfo.customData = customData;
 
-                // add movie artwork
-                if(typeof(artwork) != 'undefined') {
-                    mediaInfo.metadata.images = [new chrome.cast.Image(artwork)];
-                }
                 var request = new chrome.cast.media.LoadRequest(mediaInfo);
 
                 // send video to chromecast
