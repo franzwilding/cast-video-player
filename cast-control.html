@@ -420,7 +420,7 @@
             },
             mediaSeekPosition: function(e){
                 var t = this;
-                this.position = e.target.value;
+                this.position = parseInt(e.target.value);
                 var req = new chrome.cast.media.SeekRequest();
                 req.currentTime = this.position;
                 this.media.seek(req);
